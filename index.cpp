@@ -13,7 +13,7 @@ using namespace std;
 - Declares Variables for each piece of data in file
 - Opens file and checks if it is open
 - Reads file using for loop and then correctly assigns each piece of data to the alligned variable
-- inputs Airport Code
+- inputs Airport Code, lattitude, and longtude to umap
 */
 unordered_map<string, pair<float,float> > AirportList (){
 
@@ -66,10 +66,8 @@ unordered_map<string, pair<float,float> > AirportList (){
     return CoordList;
 
 }
+//Prints out Umap
 void PrintList(unordered_map<string, pair<float,float> > &CoordinatesList){
-
-
-    
     for (auto &it:CoordinatesList) {
     //it.first (string), it.second.first (x slot), it.second.first (y slot)
         cout << it.first << ": Lattitude-" << it.second.first << " Longitude-" << it.second.second << endl;
@@ -77,14 +75,59 @@ void PrintList(unordered_map<string, pair<float,float> > &CoordinatesList){
     }
 }
 
+float deg2rad(float deg){
+	return deg * M_PI / 180.0;
+}
+
+float CoordDist(unordered_map<string, pair<float,float> > &CoordinatesList){
+	string AirKeyDepart, AirKeyArrival;
+	float LatDep, LatArr, LongDep, LongArr, DistLat, DistLong, TotDist, AHavSin, CHavSin;
+	const float EarthRad = 6371.0;
+
+	cout << "Departure Airport Code: ";
+	cin >> AirKeyDepart;
+	cout << endl << "Arrival Airport Code: ";
+	cin >> AirKeyArrival;
+
+	auto depart = CoordinatesList.find(AirKeyDepart);
+	auto arrival = CoordinatesList.find(AirKeyArrival);
+
+	if (depart != CoordinatesList.end() && arrival != CoordinatesList.end()) {
+        LatDep = depart -> second.first;
+		LongDep = depart -> second.second;
+		LatArr = arrival -> second.first;
+		LongArr = arrival -> second.second;
+    } else {
+        cout << "Key not found." << endl;
+    }
+
+	// Convert latitude and longitude from degrees to radians
+    LatDep = deg2rad(LatDep);
+    LongDep = deg2rad(LongDep);
+    LatArr = deg2rad(LatArr);
+    LongArr = deg2rad(LongArr);
+
+	//Haversine Formula implementation
+	DistLat = LatArr - LatDep;
+	DistLong = LongArr - LongDep;
+
+	AHavSin = pow(sin(DistLat / 2.0), 2) + cos(LatDep) * cos(LatArr) * pow(sin(DistLong / 2.0), 2);
+    CHavSin = 2 * atan2(sqrt(AHavSin), sqrt(1 - AHavSin));
+    TotDist = EarthRad * CHavSin;
+
+	cout << "Distance from " << AirKeyDepart << " to " << AirKeyArrival << ": " << TotDist << "Km";
+	return TotDist;
+}
+
 int main(){
-//Opens airport text file and checks if it opened correctly
+//Umap decleared
 
 unordered_map<string, pair<float,float> > CoordinatesList;
 
 CoordinatesList = AirportList();	
 
-PrintList(CoordinatesList);	
+//PrintList(CoordinatesList);
+CoordDist(CoordinatesList);	
 
 }
 
