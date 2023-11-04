@@ -7,8 +7,26 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
+#include <chrono>
+#include "../Headers/Aircraft.h"
+
 
 using namespace std;
+
+class Route {
+	private:
+
+	Aircraft Plane;
+	string CityDepart;
+	string CityArrival;
+	float Dist;
+	float Tickprice;
+	float FlightTime;
+	int LocalDepTime;
+	int LocalArrTime;
+	public:
+	
+};
 /* Function
 - Declares Variables for each piece of data in file
 - Opens file and checks if it is open
@@ -19,14 +37,14 @@ unordered_map<string, pair<float,float> > AirportList (){
 
 
     unordered_map<string, pair<float,float> > CoordList;
-    string AirportCode, iata, Airport, Country;
+    string Icao, Iata, Airport, Country;
 	string City;
 	string LatDeg, LatMin, LatSec, LatDir, Altitude; 		
 	string LongDeg, LongMin, LongSec, LongDir;
 	float Lat, Long;
 	string line, LatDec, LongDec;
     
-	ifstream GAD("GlobalAirportDatabase.txt");
+	ifstream GAD("../Data/GlobalAirportDatabase.txt");
     if(!GAD.is_open())
     {
         cout << "File not open" << endl;
@@ -37,8 +55,8 @@ unordered_map<string, pair<float,float> > AirportList (){
 		while(getline(GAD, line))
 		{	
 			stringstream ss(line);
-			getline(ss, AirportCode, ':');
-			getline(ss, iata, ':');
+			getline(ss, Icao, ':');
+			getline(ss, Iata, ':');
 			getline(ss, Airport, ':');
 			getline(ss, City, ':');
 			getline(ss, Country, ':');
@@ -57,7 +75,7 @@ unordered_map<string, pair<float,float> > AirportList (){
 			getline(ss, LongDec, ':');
 			Long = stof(LongDec);
             if(Lat!=0 && Long !=0){
-                CoordList.insert(make_pair(AirportCode,make_pair(Lat, Long)));
+                CoordList.insert(make_pair(Iata,make_pair(Lat, Long)));
             }
 		}
 	}
@@ -74,11 +92,15 @@ void PrintList(unordered_map<string, pair<float,float> > &CoordinatesList){
 
     }
 }
-
+//Converts degrees to radians
 float deg2rad(float deg){
 	return deg * M_PI / 180.0;
 }
 
+/*
+Takes a departure and arrival city and uses the Umap to find their global positioning and calculate the total distance between
+the two cities
+*/
 float CoordDist(unordered_map<string, pair<float,float> > &CoordinatesList){
 	string AirKeyDepart, AirKeyArrival;
 	float LatDep, LatArr, LongDep, LongArr, DistLat, DistLong, TotDist, AHavSin, CHavSin;
@@ -119,6 +141,8 @@ float CoordDist(unordered_map<string, pair<float,float> > &CoordinatesList){
 	return TotDist;
 }
 
+
+
 int main(){
 //Umap decleared
 
@@ -128,7 +152,6 @@ CoordinatesList = AirportList();
 
 //PrintList(CoordinatesList);
 CoordDist(CoordinatesList);	
-
 }
 
 
